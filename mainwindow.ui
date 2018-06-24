@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>475</width>
+    <height>349</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>475</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuRecord">
+    <property name="title">
+     <string>日志</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuComm">
+    <property name="title">
+     <string>通信</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuChart">
+    <property name="title">
+     <string>图表</string>
+    </property>
+    <widget class="QMenu" name="menu">
+     <property name="title">
+      <string>显示点数</string>
+     </property>
+     <addaction name="act10Points"/>
+     <addaction name="act20Points"/>
+     <addaction name="act50Points"/>
+     <addaction name="act100Points"/>
+    </widget>
+    <addaction name="menu"/>
+    <addaction name="actChartAniSwitch"/>
+   </widget>
+   <addaction name="menuRecord"/>
+   <addaction name="menuComm"/>
+   <addaction name="menuChart"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actChartAniSwitch">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>动画</string>
+   </property>
+   <property name="toolTip">
+    <string>图表动画开关</string>
+   </property>
+  </action>
+  <action name="act10Points">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>10 (1point / s)</string>
+   </property>
+  </action>
+  <action name="act20Points">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>20 (2points / s)</string>
+   </property>
+  </action>
+  <action name="act50Points">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>50 (5points / s)</string>
+   </property>
+  </action>
+  <action name="act100Points">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>100 (10points / s)</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
