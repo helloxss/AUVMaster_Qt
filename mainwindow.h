@@ -4,11 +4,16 @@
 #include <QMainWindow>
 #include <QSplitter>
 #include <QTimer>
-#include <QChartView>
+#include <QThread>
+#include <QPointer>
 #include "controlpane.h"
 #include "logpane.h"
 #include "opencvpane.h"
 #include "chartpane.h"
+#include "communication.h"
+#include "propeller.h"
+#include "autocontrol.h"
+#include "switchled.h"
 
 namespace Ui {
 class MainWindow;
@@ -24,9 +29,13 @@ public:
 
 signals:
 	void test(double d);
+	void creatComm();
+	void creatAutoCtrl();
+	void startAutoCtrl();
 
 protected:
 	void resizeEvent(QResizeEvent *event);
+	void keyPressEvent(QKeyEvent *e);
 
 private:
 	Ui::MainWindow *ui;
@@ -43,13 +52,24 @@ private:
 	QSplitter *hozSplter1;	//竖直分隔条
 	QSplitter *hozSplter2;	//竖直分隔条
 
+	QPointer<Communication> comm = nullptr;
+	QPointer<QThread> commThread = nullptr;
+
+	QPointer<AutoControl> autoControl = nullptr;
+	QPointer<QThread> autoDepthThread = nullptr;
+
+	Propeller *thePropeller;
+	SwitchLED *theSwitchLED;
+
+	unsigned int chartDispCnt = 9;//每收到chartDispCnt+1个数据，就在pChartPane上添加一个点
+
 	void splitWindow();
 	void constructConnect();
 
-	//测试
 private slots:
-	void timerUpdate();
-	//测试
+	void depthDispSlot(double d);
+	void waterLeakWarnSlot();
+
 	void on_actChartAniSwitch_triggered(bool checked);
 	void on_act10Points_triggered(bool checked);
 	void on_act20Points_triggered(bool checked);

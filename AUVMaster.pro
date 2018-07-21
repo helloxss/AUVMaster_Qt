@@ -19,14 +19,29 @@ SOURCES += main.cpp\
     controlpane.cpp \
     logpane.cpp \
     opencvpane.cpp \
-    chartpane.cpp
+    chartpane.cpp \
+    communication.cpp \
+    propeller.cpp \
+    autocontrol.cpp \
+    sepintegralPID.cpp \
+    normalPID.cpp \
+    switchled.cpp \
+    task.cpp
 
 HEADERS  += mainwindow.h \
     controlpane.h \
     logpane.h \
     opencvpane.h \
     defines.h \
-    chartpane.h
+    chartpane.h \
+    communication.h \
+    propeller.h \
+    autocontrol.h \
+    structs.h \
+    sepintegralPID.h \
+    normalPID.h \
+    switchled.h \
+    task.h
 
 FORMS    += mainwindow.ui \
     controlpane.ui

@@ -20,6 +20,5 @@ int main(int argc, char *argv[])
 
 	w.show();
 	w.setWindowTitle(QStringLiteral("AUV 主控系统 - AUV Master System"));
-//	w.setWindowTitle(QString::fromLocal8Bit("主控系统"));
 	return a.exec();
 }
