@@ -2,6 +2,7 @@
 #define CONTROLPANE_H
 
 #include "logpane.h"
+#include "structs.h"
 #include <QWidget>
 #include <QTimer>
 #include <QKeyEvent>
@@ -18,13 +19,31 @@ public:
 	explicit ControlPane(QWidget *parent = 0);
 	~ControlPane();
 
+public slots:
+	void setLEDColor(QColor c);
+	void setPosture(PostureData p);
+	void setDepth(double d);
+	void setThrusterDisp(int t1, int t2, int t3, int t4, int t5, int t6);
+
 signals:
 	void operateLog(QString, LogPane::WarnLevel);
-	void order(QString);
+	void LEDFlash(LEDSetting);
+	void mannualGoSgl(int Lv);
+	void mannualTurnSgl(int Lv);
+	void mannualOffsetSgl(int Lv);
+	void autoDepthSwitch(bool);
+	void setAutoDepth(double);
+	void autoHeadingSwitch(bool);
+	void setAutoHeading(double);
+	void propSwitch(bool);
+	void camSwitch(bool);
 
 private:
 	Ui::ControlPane *ui;
 	QTimer * timeDispTimer;
+	unsigned short PressedKeys = 0;
+	double curYaw = 0;
+	void keyReaction(unsigned short k);
 
 private slots:
 	void timeDispTimerUpdate();
@@ -50,8 +69,22 @@ private slots:
 	void on_btnForward_clicked();
 	void on_btnBackward_clicked();
 
+	void on_btnSet0Depth_clicked();
+
+	void on_btnUseCurYaw_clicked();
+
+	void on_depthVal_valueChanged(double arg1);
+
+	void on_courseVal_valueChanged(double arg1);
+
+	void on_btnThrsSwitch_clicked(bool checked);
+
+	void on_btnCamSwitch_clicked(bool checked);
+
 protected:
 	void keyPressEvent(QKeyEvent * e);
+	void keyReleaseEvent(QKeyEvent *e);
+//	void
 
 };
 

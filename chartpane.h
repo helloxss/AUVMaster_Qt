@@ -22,13 +22,14 @@ public:
 	QTimer *testTimer= nullptr;
 	QChart *chart = nullptr;
 	QSplineSeries *line = nullptr;
+//	QLineSeries *line = nullptr;
 	QScatterSeries *scatter = nullptr;
 
 	void animation(bool isAnimation);
 	void setDispCount(unsigned int c)
 	{
-		qDebug()<<"set disp count as"<<c;
-		if(c > TickCountConst)
+//		qDebug()<<"set disp count as"<<c;
+		if(c >= TickCountConst)
 			DispCount = c;
 	}
 
@@ -36,10 +37,13 @@ public slots:
 	void addData(double d);
 
 private:
+	void keyPressEvent(QKeyEvent * e);
+	unsigned short easterEgg = 0;
+
 	QValueAxis *axis_X = nullptr;
 	QValueAxis *axis_Y = nullptr;
 
-	const unsigned int TickCountConst = 10;//刻度数，注意最好为2 5 的倍数，否则可能滚动出错
+	const unsigned int TickCountConst = 11;//刻度数
 	unsigned int DispCount = 11;//显示的点数，注意显示的线段数为点数-1，即点数-1为最后一个所处的刻度位置
 
 	bool isFirst = true;

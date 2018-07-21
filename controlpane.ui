@@ -53,7 +53,7 @@
      <widget class="QWidget" name="layoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>480</x>
+        <x>500</x>
         <y>100</y>
         <width>111</width>
         <height>191</height>
@@ -105,7 +105,7 @@
      <widget class="QWidget" name="layoutWidget_3">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>230</x>
         <y>220</y>
         <width>261</width>
         <height>62</height>
@@ -157,7 +157,7 @@
      <widget class="QWidget" name="layoutWidget_4">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>230</x>
         <y>110</y>
         <width>261</width>
         <height>62</height>
@@ -209,9 +209,9 @@
      <widget class="QGroupBox" name="groupBox_5">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>210</x>
         <y>60</y>
-        <width>411</width>
+        <width>401</width>
         <height>20</height>
        </rect>
       </property>
@@ -225,7 +225,7 @@
      <widget class="Line" name="line_3">
       <property name="geometry">
        <rect>
-        <x>180</x>
+        <x>200</x>
         <y>80</y>
         <width>20</width>
         <height>211</height>
@@ -246,7 +246,7 @@
        <rect>
         <x>10</x>
         <y>60</y>
-        <width>171</width>
+        <width>191</width>
         <height>20</height>
        </rect>
       </property>
@@ -289,77 +289,132 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="layoutWidget">
+     <widget class="QWidget" name="layoutWidget_5">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>100</y>
-        <width>151</width>
-        <height>191</height>
+        <y>120</y>
+        <width>183</width>
+        <height>129</height>
        </rect>
       </property>
-      <layout class="QGridLayout" name="gridLayout_21">
+      <layout class="QGridLayout" name="gridLayout_6">
        <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_19">
-         <item row="0" column="0">
-          <widget class="QPushButton" name="btnDepthClosedLoop">
-           <property name="text">
-            <string>深度闭环</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QDoubleSpinBox" name="depthVal"/>
-         </item>
-        </layout>
+        <widget class="QPushButton" name="btnDepthClosedLoop">
+         <property name="text">
+          <string>深度闭环</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
        <item row="1" column="0">
+        <widget class="QPushButton" name="btnSet0Depth">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>设为0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1" colspan="3">
         <widget class="QPushButton" name="btnRefreshDepth">
          <property name="enabled">
           <bool>false</bool>
          </property>
          <property name="text">
-          <string>更新深度</string>
+          <string>更新目标深度</string>
          </property>
          <property name="flat">
           <bool>false</bool>
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="Line" name="line_4">
+       <item row="2" column="0" colspan="4">
+        <widget class="Line" name="line_6">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
        <item row="3" column="0">
-        <layout class="QGridLayout" name="gridLayout_20">
-         <item row="0" column="0">
-          <widget class="QPushButton" name="btnCourseClosedLoop">
-           <property name="text">
-            <string>航向闭环</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QDoubleSpinBox" name="courseVal"/>
-         </item>
-        </layout>
+        <widget class="QPushButton" name="btnCourseClosedLoop">
+         <property name="text">
+          <string>航向闭环</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1" colspan="2">
+        <widget class="QDoubleSpinBox" name="courseVal">
+         <property name="wrapping">
+          <bool>true</bool>
+         </property>
+         <property name="minimum">
+          <double>-180.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>180.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>5.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="3">
+        <widget class="QLabel" name="label_7">
+         <property name="text">
+          <string>°</string>
+         </property>
+        </widget>
        </item>
        <item row="4" column="0">
+        <widget class="QPushButton" name="btnUseCurYaw">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>当前角度</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1" colspan="3">
         <widget class="QPushButton" name="btnRefreshCourse">
          <property name="enabled">
           <bool>false</bool>
          </property>
          <property name="text">
-          <string>更新航向</string>
+          <string>更新目标航向</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>cm</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" colspan="2">
+        <widget class="QDoubleSpinBox" name="depthVal">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="frame">
+          <bool>true</bool>
+         </property>
+         <property name="decimals">
+          <number>0</number>
+         </property>
+         <property name="maximum">
+          <double>1000.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>10.000000000000000</double>
          </property>
         </widget>
        </item>
@@ -435,9 +490,9 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>0</y>
+     <y>10</y>
      <width>571</width>
-     <height>185</height>
+     <height>171</height>
     </rect>
    </property>
    <layout class="QGridLayout" name="gridLayout_11">
@@ -452,6 +507,22 @@
       </item>
       <item row="1" column="0">
        <layout class="QGridLayout" name="gridLayout_8">
+        <item row="0" column="1">
+         <widget class="QPushButton" name="btnAdvCtrl">
+          <property name="styleSheet">
+           <string notr="true">font: 10pt &quot;微软雅黑&quot;;</string>
+          </property>
+          <property name="text">
+           <string>高级控制</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="flat">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="3">
          <widget class="QPushButton" name="btnParaSet">
           <property name="styleSheet">
@@ -481,22 +552,6 @@
           </property>
           <property name="checked">
            <bool>false</bool>
-          </property>
-          <property name="flat">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QPushButton" name="btnAdvCtrl">
-          <property name="styleSheet">
-           <string notr="true">font: 10pt &quot;微软雅黑&quot;;</string>
-          </property>
-          <property name="text">
-           <string>高级控制</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
           </property>
           <property name="flat">
            <bool>false</bool>
@@ -614,63 +669,138 @@
     </item>
     <item row="2" column="0">
      <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
-       <layout class="QGridLayout" name="gridLayout_7">
-        <item row="3" column="1">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>…</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" alignment="Qt::AlignRight">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>深度：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="txtYaw">
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" alignment="Qt::AlignRight">
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>偏航：</string>
-          </property>
-         </widget>
+      <item row="0" column="2">
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>1:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="txtThr1">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
         <item row="1" column="1">
-         <widget class="QLabel" name="txtPit">
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
+         <layout class="QFormLayout" name="formLayout_3">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>3:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="txtThr3">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
-        <item row="2" column="0" alignment="Qt::AlignRight">
-         <widget class="QLabel" name="label_15">
-          <property name="text">
-           <string>横滚：</string>
-          </property>
-         </widget>
+        <item row="1" column="2">
+         <layout class="QFormLayout" name="formLayout_4">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>4:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="txtThr4">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="txtRol">
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
+        <item row="1" column="3">
+         <layout class="QFormLayout" name="formLayout_5">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>5:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="txtThr5">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
-        <item row="1" column="0" alignment="Qt::AlignRight">
-         <widget class="QLabel" name="label_16">
-          <property name="text">
-           <string>俯仰：</string>
-          </property>
-         </widget>
+        <item row="1" column="4">
+         <layout class="QFormLayout" name="formLayout_6">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>6:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="txtThr6">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="0">
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>2:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="txtThr2">
+            <property name="text">
+             <string>0</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0">
+         <layout class="QFormLayout" name="formLayout_7">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>灯色:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="LEDColor">
+            <property name="styleSheet">
+             <string notr="true">font: 9pt &quot;微软雅黑&quot;;
+background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255)); 
+color: rgba(0, 0, 0, 255);</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
@@ -687,60 +817,79 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <layout class="QGridLayout" name="gridLayout_9">
+      <item row="0" column="0">
+       <layout class="QGridLayout" name="gridLayout_7">
         <item row="0" column="0">
-         <layout class="QGridLayout" name="gridLayout_15">
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_8">
-            <property name="text">
-             <string>000</string>
-            </property>
-           </widget>
-          </item>
+         <layout class="QFormLayout" name="formLayout_19">
           <item row="0" column="0">
-           <widget class="QLabel" name="label_7">
+           <widget class="QLabel" name="label_29">
             <property name="text">
-             <string>000</string>
+             <string>偏航：</string>
             </property>
            </widget>
           </item>
-          <item row="1" column="0">
-           <widget class="Line" name="line_6">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
+          <item row="0" column="1">
+           <widget class="QLabel" name="txtYaw">
+            <property name="text">
+             <string>...</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_17">
-          <property name="text">
-           <string>000</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>000</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1">
-         <widget class="QLabel" name="label_18">
-          <property name="text">
-           <string>000</string>
-          </property>
-         </widget>
+         <layout class="QFormLayout" name="formLayout_20">
+          <item row="0" column="1">
+           <widget class="QLabel" name="txtRoll">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_30">
+            <property name="text">
+             <string>横滚：</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
-        <item row="0" column="4">
-         <widget class="QLabel" name="label_19">
-          <property name="text">
-           <string>000</string>
-          </property>
-         </widget>
+        <item row="1" column="0">
+         <layout class="QFormLayout" name="formLayout_21">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_31">
+            <property name="text">
+             <string>俯仰：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="txtPitch">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="1">
+         <layout class="QFormLayout" name="formLayout_22">
+          <item row="0" column="1">
+           <widget class="QLabel" name="txtDepth">
+            <property name="text">
+             <string>...</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_33">
+            <property name="text">
+             <string>深度：</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </item>
