@@ -40,6 +40,9 @@ void Communication::create()
 	openDepthSensorPort();
 	openPostureSensorPort();
 
+	sendToSwitchArduino("D8@0#");
+	sendToSwitchArduino("D7@0#");
+
 	depthTimer = new QTimer;
 	/*$：起始符 00RP0：传感器地址 32："00RP0"每个字符取异或的结果 \r：结束符*/
 	connect(depthTimer, &QTimer::timeout, this, [this]{sendToDepthSensor(QSL("$00RP032\r"));});
@@ -109,7 +112,7 @@ bool Communication::openPropellerPort()
 	propellerPort->setPortName(PROPELLER_PORT);
 	if (propellerPort->open(QIODevice::ReadWrite))
 	{
-		propellerPort->setBaudRate(QSerialPort::Baud9600);  //波特率
+		propellerPort->setBaudRate(QSerialPort::Baud115200);  //波特率
 		propellerPort->setDataBits(QSerialPort::Data8);     //数据位
 		propellerPort->setParity(QSerialPort::NoParity);    //无奇偶校验
 		propellerPort->setStopBits(QSerialPort::OneStop);   //无停止位
@@ -121,9 +124,9 @@ bool Communication::openPropellerPort()
 	else
 	{
 		emit operateLog(QSL("通信：推进器串口打开失败"), LogPane::err);
-		QMessageBox::critical(NULL, QStringLiteral("串口错误"), \
-		                      QSL("推进器串口(\"%1\")打开失败，请检查它的状态。\n程序因此无法正常运行。")\
-		                      .arg(propellerPort->portName()));
+//		QMessageBox::critical(NULL, QStringLiteral("串口错误"), \
+//		                      QSL("推进器串口(\"%1\")打开失败，请检查它的状态。\n程序因此无法正常运行。")\
+//		                      .arg(propellerPort->portName()));
 		return false;
 	}
 }
@@ -147,9 +150,9 @@ bool Communication::openSwitchArduinoPort()
 	{
 		emit operateLog(QSL("通信：开关控制板串口打开失败"), LogPane::err);
 		//		QApplication::beep();
-		QMessageBox::critical(NULL, QStringLiteral("串口错误"), \
-		                      QSL("开关控制板串口(\"%1\")打开失败，请检查它的状态。\n程序因此无法正常运行。")\
-		                      .arg(switchArduinoPort->portName()));
+//		QMessageBox::critical(NULL, QStringLiteral("串口错误"), \
+//		                      QSL("开关控制板串口(\"%1\")打开失败，请检查它的状态。\n程序因此无法正常运行。")\
+//		                      .arg(switchArduinoPort->portName()));
 		return false;
 	}
 }
@@ -173,9 +176,9 @@ bool Communication::openLEDArduinoPort()
 	{
 		emit operateLog(QSL("通信：LED控制板串口打开失败"), LogPane::err);
 		//		QApplication::beep();
-		QMessageBox::critical(NULL, QStringLiteral("串口错误"), \
-		                      QSL("LED控制板串口(\"%1\")打开失败，请检查它的状态。\n程序因此无法正常运行。")\
-		                      .arg(LEDArduinoPort->portName()));
+//		QMessageBox::critical(NULL, QStringLiteral("串口错误"), \
+//		                      QSL("LED控制板串口(\"%1\")打开失败，请检查它的状态。\n程序因此无法正常运行。")\
+//		                      .arg(LEDArduinoPort->portName()));
 		return false;
 	}
 }
@@ -199,9 +202,9 @@ bool Communication::openDepthSensorPort()
 	{
 		emit operateLog(QSL("通信：深度传感器机串口打开失败"), LogPane::err);
 		//		QApplication::beep();
-		QMessageBox::critical(NULL, QStringLiteral("串口错误"), \
-							  QSL("深度传感器串口(\"%1\")打开失败，请检查它的状态。\n程序因此无法正常运行。")\
-		                      .arg(depthSensorPort->portName()));
+//		QMessageBox::critical(NULL, QStringLiteral("串口错误"), \
+//							  QSL("深度传感器串口(\"%1\")打开失败，请检查它的状态。\n程序因此无法正常运行。")\
+//		                      .arg(depthSensorPort->portName()));
 		return false;
 	}
 }
@@ -212,7 +215,7 @@ bool Communication::openPostureSensorPort()
 	postureSensorPort->setPortName(POSTURE_SENSOR_PORT);
 	if (postureSensorPort->open(QIODevice::ReadWrite))
 	{
-		postureSensorPort->setBaudRate(QSerialPort::Baud9600);  //波特率
+		postureSensorPort->setBaudRate(QSerialPort::Baud115200);  //波特率
 		postureSensorPort->setDataBits(QSerialPort::Data8);     //数据位
 		postureSensorPort->setParity(QSerialPort::NoParity);    //无奇偶校验
 		postureSensorPort->setStopBits(QSerialPort::OneStop);   //无停止位
@@ -225,9 +228,9 @@ bool Communication::openPostureSensorPort()
 	{
 		emit operateLog(QSL("通信：姿态传感器串口打开失败"), LogPane::err);
 		//		QApplication::beep();
-		QMessageBox::critical(NULL, QStringLiteral("串口错误"), \
-							  QSL("姿态传感器串口(\"%1\")打开失败，请检查它的状态。\n程序因此无法正常运行。")\
-		                      .arg(postureSensorPort->portName()));
+//		QMessageBox::critical(NULL, QStringLiteral("串口错误"), \
+//							  QSL("姿态传感器串口(\"%1\")打开失败，请检查它的状态。\n程序因此无法正常运行。")\
+//		                      .arg(postureSensorPort->portName()));
 		return false;
 	}
 }
@@ -244,51 +247,63 @@ void Communication::switchArduinoDataProc(QString &data)
 
 void Communication::LEDArduinoDataProc(QString &data)
 {
-	bool isGoodColor = true;
+	static bool isWaterDetected = false;
+//	qDebug()<<"data:"<<data;
 
-	if(data.contains("water"))//漏液检测
-		emit leakWater();
+	QStringList list = data.split("\r\n", QString::SkipEmptyParts);
+	if(!data.endsWith("\r\n"))
+		list.removeLast();
+//	qDebug()<<"list:"<<list;
 
-	while(data.count() >= 2)
-	{		\
-		switch (data.at(0).toLatin1()) {
-		case 'R':
-			if(data.at(1) == '1')
-				LEDColor.setRed(255);
-			else if(data.at(1) == '0')
-				LEDColor.setRed(0);
-			data.remove(0,2);
-			break;
-		case 'G':
-			if(data.at(1) == '1')
-				LEDColor.setGreen(255);
-			else if(data.at(1) == '0')
-				LEDColor.setGreen(0);
-			data.remove(0,2);
-			break;
-		case 'B':
-			if(data.at(1) == '1')
-				LEDColor.setBlue(255);
-			else if(data.at(1) == '0')
-				LEDColor.setBlue(0);
-			data.remove(0,2);
-			break;
-		default:
-			isGoodColor = false;
-			data.remove(0,1);
-			break;
-		}
-		if(isGoodColor)
-		{
-			emit LED(LEDColor);
-		}
-	}//while(data.count() >= 2)
+	if(!list.isEmpty())
+	{
+		int uselessDataCnt = 0;
+
+		foreach (QString s, list) {
+			uselessDataCnt += s.length() + 2;
+			if(s.length() == 2)
+				switch(s.at(0).toLatin1())
+				{
+				case 'R':
+					if(s.at(1) == '1')
+						LEDColor.setRed(255);
+					else if(s.at(1) == '0')
+						LEDColor.setRed(0);
+					break;
+				case 'G':
+					if(s.at(1) == '1')
+						LEDColor.setGreen(255);
+					else if(s.at(1) == '0')
+						LEDColor.setGreen(0);
+					break;
+				case 'B':
+					if(s.at(1) == '1')
+						LEDColor.setBlue(255);
+					else if(s.at(1) == '0')
+						LEDColor.setBlue(0);
+				default:
+					break;
+				}//switch(s.at(0).toLatin1())
+			else if(s == "Water" && false == isWaterDetected)
+			{
+				isWaterDetected = true;
+				emit leakWater();
+//				qDebug()<<"water detected";
+			}
+		}//foreach (QString s, list)
+
+		emit LED(LEDColor);
+//		qDebug()<<"LEDColor:"<<LEDColor;
+//		qDebug()<<endl;
+
+		data.remove(0, uselessDataCnt);
+	}
 }
 
 void Communication::depthSensorDataProc(QString &data)
 {
-	QTime t;
-	t.start();
+//	QTime t;
+//	t.start();
 	//1. 按照\r对数据进行分割
 //	qDebug()<<"data:"<< data;
 	QStringList list = data.split('\r', QString::SkipEmptyParts);//注意分割得到的字符串没有'\r'了
@@ -359,12 +374,59 @@ void Communication::depthSensorDataProc(QString &data)
 
 void Communication::postureSensorDataProc(QString &data)
 {
+	static PostureData p;
+//	qDebug()<<"data:"<<data;
 
+	//1. 按照\r\n对字符串进行分割，得到一类数据字符串
+	QStringList list = data.split("\r\n", QString::SkipEmptyParts);
+	if(!data.endsWith("\r\n"))//确保每一项都是拥有完整报尾的消息
+		list.removeLast();
+//	qDebug()<<"list:"<<list;
+	if(!list.isEmpty())//分割形成的列表中有元素？
+	{
+		int uselessDataCnt = 0;
+
+		//2. 对1中分割得到的字符串按照","进行第二次分割，得到报头字符串和每个方向上的分量字符串
+		foreach (QString str1, list) {
+			QStringList lst = str1.split(',', QString::SkipEmptyParts);
+//			qDebug()<<"lst:"<<lst;
+
+			//3. 检查报头
+			uselessDataCnt += str1.length() + 2;
+			if(lst.at(0) == "$PRDID")
+			{
+				if(lst.size() == 4)//接收到了完整的4个数据
+				{
+//					qDebug()<<"$PRDID detected";
+					p.pitch = lst.at(1).toDouble();
+					p.roll = lst.at(2).toDouble();
+					p.yaw = lst.at(3).toDouble();
+				}
+			}
+			else if(lst.at(0) == "$PSONCMS")
+			{
+				if(lst.size() == 15)
+				{
+//					qDebug()<<"$PSONCMS detected";
+					p.rolSpd = lst.at(8).toDouble() * 180 / 3.141592653;
+					p.pitSpd = -lst.at(9).toDouble()* 180 / 3.141592653;
+					p.yawSpd = -lst.at(10).toDouble()* 180 / 3.141592653;
+				}
+			}
+		}//foreach (QString str1, list)
+
+		emit posture(p);
+
+		data.remove(0, uselessDataCnt);
+	}//if(!list.isEmpty())
+
+//	qDebug()<<"after proc, data:"<<data;
+//	qDebug()<<endl;
 }
 
 void Communication::readPropellerPort()
 {
-	qDebug() <<"readPropellerPort"<< QThread::currentThreadId();
+//	qDebug() <<"readPropellerPort"<< QThread::currentThreadId();
 	QByteArray temp = propellerPort->readAll();
 	propellerRecvStr.append(temp);
 	propellerDataProc(propellerRecvStr);
@@ -375,6 +437,7 @@ void Communication::readSwitchArduinoPort()
 {
 //	qDebug() << "switch arduino port:" << switchArduinoPort->readAll();
 	QByteArray temp = switchArduinoPort->readAll();
+	emit recvedMsg(QSL("开关"), temp);
 	switchArduinoRecvStr.append(temp);
 	switchArduinoDataProc(switchArduinoRecvStr);
 }
@@ -382,8 +445,9 @@ void Communication::readSwitchArduinoPort()
 void Communication::readLEDArduinoPort()
 {
 //	qDebug() << "readLEDArduinoPort:" << LEDArduinoPort->readAll();
-	qDebug()<<QThread::currentThreadId();
+//	qDebug()<<QThread::currentThreadId();
 	QByteArray temp = LEDArduinoPort->readAll();
+	emit recvedMsg(QSL("LED"), temp);
 	LEDArduinoRecvStr.append(temp);
 	LEDArduinoDataProc(LEDArduinoRecvStr);
 }
@@ -392,6 +456,7 @@ void Communication::readDepthSensorPort()
 {
 //	qDebug() << "readDepthSensorPort:" << depthSensorPort->readAll();
 	QByteArray temp = depthSensorPort->readAll();
+	emit recvedMsg(QSL("深度"), temp);
 	depthSensorRecvStr.append(temp);
 	depthSensorDataProc(depthSensorRecvStr);
 }
@@ -400,6 +465,7 @@ void Communication::readPostureSensorPort()
 {
 //	qDebug() << "readPostureSensorPore:" << postureSensorPort->readAll();
 	QByteArray temp = postureSensorPort->readAll();
+	emit recvedMsg(QSL("姿态"), temp);
 	postureSensorRecvStr.append(temp);
 	postureSensorDataProc(postureSensorRecvStr);
 }

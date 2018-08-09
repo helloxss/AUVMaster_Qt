@@ -18,54 +18,29 @@ signals:
 	void operateLog(QString, LogPane::WarnLevel);
 
 public slots:
-	void autoDepthDelta(int lv)
-	{
-		autoDepthVert = lv;
-	}
+	void autoDepthDelta(int lv) { autoDepthVert = lv; }
+	void autoHeadingDelta(int lv) { autoHeadingHoriLv = lv; }
+	void autoPitchDelta(int lv) { autoPitchVertLv = lv; }
+	void mannualGoDelta(int m);
+	void mannualTurnDelta(int h);
+	void mannualOffsetDelta(int h);
+	void taskTurnDelta(int lv) { taskTurn = lv; }
+	void taskOffsetDelta(int lv) {taskOffset = lv; }
+	void taskGoDelta(int lv) { taskGo = lv; }
+	void taskDiveDelta(int lv){ taskDive = lv; }
+	void autoCtrlRunning(unsigned char b);//自动控制开启后，propeller自动地发送推进器指令。未开启自动控制，则手动操作后发送推进器指令
 
-	void autoHeadingDelta(int lv)
-	{
-		autoHeadingHoriLv = lv;
-	}
-
-	void autoPitchDelta(int lv)
-	{
-		autoPitchVertLv = lv;
-	}
-
-	void mannualGoDelta(int m)
-	{
-		mannualGo = m;
-	}
-
-	void mannualTurnDelta(int h)
-	{
-		mannualTurn = h;
-	}
-
-	void mannualOffsetDelta(int h)
-	{
-		mannualOffset = h;
-	}
-
-	void taskDelta(int t[6])
-	{
-		memcpy(task, t, sizeof(int)*6);
-	}
-
-	void autoCtrlRunning(bool autoDepth, bool autoPitch)
-	{
-//		isTaskRunning = isStart;
-	}
-
-private slots:
+	private slots:
 	void orderTimerUpdate();
 
 private:
 	int autoDepthVert = 0;		//定深调整量
 	int autoHeadingHoriLv = 0;	//定航调整量
 	int autoPitchVertLv = 0;	//定俯仰前垂调整量
-	int task[6];				//任务推进器调整量
+	int taskTurn = 0;
+	int taskOffset = 0;
+	int taskGo = 0;
+	int taskDive = 0;
 	int mannualGo = 0;
 	int mannualTurn = 0;
 	int mannualOffset = 0;
@@ -79,30 +54,23 @@ private:
 	int frontVert = 0;
 
 	//以下：推进器死区值
-	int leftMainLowDZ = 1488;
-	int leftMainHighDZ = 1527;
+	const int leftMainLowDZ = 1488;
+	const int leftMainHighDZ = 1527;
 
-	int rightMainLowDZ = 1492;
-	int rightMainHighDZ = 1531;
+	const int rightMainLowDZ = 1492;
+	const int rightMainHighDZ = 1531;
 
-	int backVertLowDZ = 1490;
-	int backVertHighDZ = 1529;
+	const int backVertLowDZ = 1490;
+	const int backVertHighDZ = 1529;
 
-	int backHoriLowDZ = 1487;
-	int backHoriHighDZ = 1534;
+	const int backHoriLowDZ = 1487;
+	const int backHoriHighDZ = 1534;
 
-	int frontHoriLowDZ = 1493;
-	int frontHoriHighDZ = 1535;
+	const int frontHoriLowDZ = 1493;
+	const int frontHoriHighDZ = 1535;
 
-	int frontVertLowDZ = 1491;
-	int frontVertHighDZ = 1530;
-
-//	int CThrusters::frontVDeadZone[2] = { 1530, 1491 };//
-//	int CThrusters::backVDeadZone[2] = { 1529, 1490 };//
-//	int CThrusters::frontHDeadZone[2] = { 1535, 1493 };//
-//	int CThrusters::backHDeadZone[2] = { 1534, 1487 };//
-//	int CThrusters::rightMDeadZone[2] = { 1531, 1492 };
-//	int CThrusters::leftMDeadZone[2] = { 1527, 1488 };
+	const int frontVertLowDZ = 1491;
+	const int frontVertHighDZ = 1530;
 
 	//以下：推进器限幅值
 	int Vdmax = 200;
@@ -112,12 +80,13 @@ private:
 	int Mdmax = 200;
 	int Mdmin = 200;
 
-	bool isTaskRunning = false;
+	bool isAutomatic = false;
 
 	QTimer *orderTimer = nullptr;
 
+	QString propOrderStr();
 	void checkLimit();
-//	void setLimit()
+	//	void setLimit()
 };
 
 #endif // PROPELLER_H

@@ -12,8 +12,8 @@
 /*
  * LED说明：
  * 1.list为空时：R - G - B循环，1秒间隔
- * 2.开启推进器：0,255,0 - 0,0,0 循环，0.333秒间隔，循环3次；关闭推进器：0,255,0 - 0,0,0 循环，0.5秒间隔，循环2次
- * 3.开启相机：0,0,255 - 0,0,0 循环，0.333秒间隔，循环3次；关闭相机：0,0,255 - 0,0,0 循环，0.5秒间隔，循环2次
+ * 2.开启推进器：0,255,0 - 0,0,0 循环，0.25秒间隔，循环4次；关闭推进器：0,255,0 - 0,0,0 循环，0.5秒间隔，循环2次
+ * 3.开启相机：0,0,255 - 0,0,0 循环，0.25秒间隔，循环4次；关闭相机：0,0,255 - 0,0,0 循环，0.5秒间隔，循环2次
  * 4.AUV任务流程开始：255,255,255 - 0,0,0 循环，1秒间隔，循环5次；AUV任务流程结束：255,255,255 - 0,0,0 循环，0.5秒间隔，循环3次
  * 5.AUV任务项目结束：255,255,255 - 0,0,0 循环，1秒间隔，循环3次
  * 6.漏液检测：255,0,0 - 0,0,0 循环，0.2秒间隔，持续
@@ -25,11 +25,13 @@ class SwitchLED : public QObject
 public:
 	explicit SwitchLED(QObject *parent = 0);
 	~SwitchLED();
+	unsigned char isSwitchOn = false;
 
 signals:
 	void operateLog(QString, LogPane::WarnLevel);
 	void switchOrder(QString);
 	void LEDOrder(QString);
+	void LEDListEmpty();
 
 public slots:
 	void propSwitchSlot(bool isOn);

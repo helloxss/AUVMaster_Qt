@@ -16,7 +16,7 @@ public:
 signals:
 
 public slots:
-	void CamDispSlot(cv::Mat img);
+	void ImgDispSlot(cv::Mat img);
 
 private:
 	QLabel *pOpencvArea;

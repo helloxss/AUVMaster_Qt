@@ -18,7 +18,7 @@ struct PostureData
 struct LEDSetting
 {
 	QList<QColor> colorList;
-	unsigned int changeTime;//LED变换一次的时间
+	unsigned int changeTime;//changeTime毫秒后，切换到colorlist的下一个颜色
 	unsigned int flashTimes;//LED变换次数
 };
 

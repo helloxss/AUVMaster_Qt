@@ -14,18 +14,18 @@ OpenCVPane::~OpenCVPane()
 
 }
 
-void OpenCVPane::CamDispSlot(cv::Mat img)
+void OpenCVPane::ImgDispSlot(cv::Mat img)
 {
-	//rows：长		cols：宽
-	double hTemp = (double)img.cols * (double)this->height() / (double)img.rows;
-	if (hTemp > this->height())
+	//cols：长		rows：宽
+	double hTemp = (double)img.rows * (double)this->width() / (double)img.cols;//当r变为w时，c变成的值
+	if (hTemp > this->height())//r变为w时，c变成的值太大：c变成h，算r的变化值
 	{
-		double wTemp = (double)img.rows * (double)this->width() / (double)img.cols;
-		cv::resize(img, img, cv::Size(this->width(), wTemp));
+		double wTemp = (double)img.cols * (double)this->height() / (double)img.rows;//当c变为h时，r变成的值
+		cv::resize(img, img, cv::Size(wTemp, this->height()));
 	}
 	else
 	{
-		cv::resize(img, img, cv::Size(hTemp, this->height()));
+		cv::resize(img, img, cv::Size(this->width(), hTemp));
 	}
 	displayMat(img);
 }
