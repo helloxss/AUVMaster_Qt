@@ -4,7 +4,7 @@
 #include "normalPID.h"
 
 /* 积分分离PID 类
- *
+ * 作者：李逸琛
  *
  */
 class SepIntegralPID : public NormalPID

@@ -23,6 +23,7 @@ public:
 	QChart *chart = nullptr;
 	QSplineSeries *line = nullptr;
 //	QLineSeries *line = nullptr;
+	QLineSeries *tgtLine = nullptr;
 	QScatterSeries *scatter = nullptr;
 
 	void animation(bool isAnimation);
@@ -35,6 +36,7 @@ public:
 
 public slots:
 	void addData(double d);
+	void setTarget(double d){ tgt = d; }
 
 private:
 	void keyPressEvent(QKeyEvent * e);
@@ -48,8 +50,9 @@ private:
 
 	bool isFirst = true;
 	double latestPointX = 0;
-	double maxY = 10;
+	double maxY = 200;
 	double minY = 0;
+	double tgt = 0;
 };
 
 #endif // CHARTPANE_H

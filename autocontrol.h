@@ -7,6 +7,7 @@
 #include "sepintegralPID.h"
 #include "structs.h"
 #include "logpane.h"
+#include "funcs.h"
 
 class AutoControl : public QObject
 {
@@ -30,21 +31,27 @@ public slots:
 	void postureData(PostureData p);
 
 	void autoDepthSwitch(bool b) {
-		isAutoDepth = b;
-		if(b)
-		{
+		if(b && !isAutoDepth)//原先没开而现在要开
 			autoDepthPID.reset();
+		isAutoDepth = b;
+		if(!b)
+		{
+			emit autoDepthProp(0);
 		}
 	}
 	void autoHeadingSwitch(bool b) {
-		isAutoHeading = b;
-		if(b)
+		if(b && !isAutoHeading)
 			autoHeadingPID.reset();
+		isAutoHeading = b;
+		if(!b)
+			emit autoHeadingProp(0);
 	}
 	void autoPitchSwitch(bool b) {
-		isAutoPitch = b;
-		if(b)
+		if(b && !isAutoPitch)
 			autoPitchPID.reset();
+		isAutoPitch = b;
+		if(!b)
+			emit autoPitchProp(0);
 	}
 
 	void setDepthTgt(double d) {autoDepthTgt = d;}
@@ -55,7 +62,7 @@ private:
 	bool isAutoDepth = false;
 	double autoDepthTgt = 0;
 	double autoDepthKp = 4, autoDepthTi = 10, autoDepthTd = 0.8, autoDepthThreshould = 100;
-	SepIntegralPID autoDepthPID;
+	NormalPID autoDepthPID;
 
 	bool isAutoHeading = false;
 	double autoHeadingTgt = 0;
@@ -69,7 +76,6 @@ private:
 
 	QTime autoDepthTime;
 
-	double signedDeltaAngle(double tgt, double base);
 };
 
 #endif // AUTOCONTROL_H

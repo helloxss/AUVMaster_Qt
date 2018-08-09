@@ -9,6 +9,7 @@ ChartPane::ChartPane(QWidget *parent):
 {
 	chart = new QChart;
 	line = new QSplineSeries(chart);
+	tgtLine = new QLineSeries(chart);
 //	line = new QLineSeries(chart);
 	scatter = new QScatterSeries(chart);
 	axis_X = new QValueAxis;
@@ -21,6 +22,7 @@ ChartPane::ChartPane(QWidget *parent):
 	chart->legend()->hide();
 	chart->addSeries(line);
 	chart->addSeries(scatter);
+	chart->addSeries(tgtLine);
 	chart->setAnimationOptions(QChart::NoAnimation);//动画选项
 	chart->createDefaultAxes();
 	//设置Y轴
@@ -31,6 +33,7 @@ ChartPane::ChartPane(QWidget *parent):
 	axis_Y->setRange(minY, maxY);
 	chart->setAxisY(axis_Y, line);
 	chart->setAxisY(axis_Y, scatter);
+	chart->setAxisY(axis_Y, tgtLine);
 	//设置X轴
 	axis_X->setTitleText(QSL("时间"));
 	axis_X->setTitleFont(font);
@@ -39,10 +42,13 @@ ChartPane::ChartPane(QWidget *parent):
 	axis_X->setRange(0, 10);
 	chart->setAxisX(axis_X, line);
 	chart->setAxisX(axis_X, scatter);
+	chart->setAxisX(axis_X, tgtLine);
 	//设置点系列
 	scatter->setMarkerSize(1.5);
-	scatter->setColor(Qt::red);
+	scatter->setColor(Qt::green);
 	scatter->setBorderColor(scatter->color());//在addseries后设置color才有效
+	//设置目标线系列
+	tgtLine->setPen(QPen(Qt::red,1,Qt::DashLine));
 
 	setChart(chart);
 	setRenderHint(QPainter::Antialiasing);
@@ -59,6 +65,7 @@ void ChartPane::addData(double d)
 		isFirst = false;
 	else
 		latestPointX += 1 / ((double)(DispCount-1) / (double)(TickCountConst-1));
+	tgtLine->append(latestPointX, tgt);
 	line->append(latestPointX, d);
 	scatter->append(latestPointX, d);
 //	qDebug() << "the new add point = " << latestPointX << ',' << d;
@@ -77,6 +84,7 @@ void ChartPane::addData(double d)
 //		qDebug()<<"removed line item "<<line->at(0);
 		line->remove(0);//循环删除首元素
 		scatter->remove(0);
+		tgtLine->remove(0);
 	}
 
 	//调整Y坐标轴范围
@@ -85,14 +93,14 @@ void ChartPane::addData(double d)
 		maxY = d;
 		chart->axisY()->setMax(maxY*1.15);
 	}
-	else if(d <= minY)
-	{
-		minY = d;
-		chart->axisY()->setMin(minY*1.15);
-	}
 
 	//debug显示新加入的点、滚动像素、line容器中所有点
-//	QString str;
+	//	QString str;
+	//	for(int i = 0;i < tgtLine->count();i++) {
+	//		str+=((QString)("(%1,%2) ")).arg(tgtLine->at(i).x()).arg(tgtLine->at(i).y());
+	//	}
+	//	qDebug()<<"TgtLine:"<<str;
+	//	QString str;
 //	for(int i = 0;i < line->count();i++) {
 //		str+=((QString)("(%1,%2) ")).arg(line->at(i).x()).arg(line->at(i).y());
 //	}
@@ -169,7 +177,7 @@ void ChartPane::keyPressEvent(QKeyEvent *e)
 	}
 	if(0xFFF == easterEgg)
 	{
-		QMessageBox::information(this,"Easter egg", QSL("CONGRATULATIONS!!\n↑↑↓↓←→←→BABA, You've just got 30 lives~"));
+		QMessageBox::information(this,"Easter egg", QSL("CONGRATULATIONS!!\n↑↑↓↓←→←→BABA, You've just got 30 lives~\n\nThis software is developed by LiYichen"));
 		easterEgg = 0;
 	}
 }

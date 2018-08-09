@@ -38,10 +38,10 @@ void LogPane::addString(QString str, LogPane::WarnLevel level)
 	switch(level)
 	{
 	case warn:
-		item->setBackgroundColor(QColor(255, 255, 192));
+		item->setBackgroundColor(QColor(255, 255, 150));
 		break;
 	case err:
-		item->setBackgroundColor(QColor(255, 192, 192));
+		item->setBackgroundColor(QColor(255, 150, 150));
 		break;
 	case info:
 	default :break;

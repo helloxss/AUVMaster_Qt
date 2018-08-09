@@ -2,8 +2,12 @@
 #include "ui_mainwindow.h"
 #include "defines.h"
 #include "time.h"
+#include "task.hpp"
+#include "vision.h"
 #include <QMessageBox>
 #include <QDateTime>
+#include <opencv2/opencv.hpp>
+#include <opencv2/core/core.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -43,22 +47,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
 	ui->actChartAniSwitch->setChecked(false);
 	ui->act10Points->setChecked(true);
-	pLogPane->addString(QString::fromLocal8Bit("系统启动于：%1，开始记录日志。")\
-	                    .arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyy年MM月dd日 hh:mm:ss"))));
+	pLogPane->addItem(QSL("系统编译时间：%1 - %2").arg(__DATE__).arg(__TIME__));
+	pLogPane->addItem(QSL("系统启动于：%1").arg(QDateTime::currentDateTime().toString(QStringLiteral("yyyy年MM月dd日 hh:mm:ss"))));
 }
 
 MainWindow::~MainWindow()
 {
-	//退出深度自动控制线程
-	autoDepthThread->quit();
-	autoDepthThread->wait();
-//	autoDepthThread->deleteLater();
-
-	//退出通信线程
-	commThread->quit();
-	commThread->wait();
-//	commThread->deleteLater();
-
 	delete ui;
 }
 
@@ -71,6 +65,38 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
 	qDebug()<<"MainWindow::keyPressEvent";
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+	if(theSwitchLED->isSwitchOn)
+	{
+		switch(QMessageBox::warning(this, QSL("退出确认"), QSL("尚未手动关闭电源，关闭电源并退出？"), QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel))
+		{
+		case QMessageBox::Yes:
+			theSwitchLED->propSwitchSlot(false);
+			theSwitchLED->camSwitchSlot(false);
+			event->accept();
+			break;
+		case QMessageBox::No:
+			event->accept();
+			break;
+		case QMessageBox::Cancel:
+		default:
+			event->ignore();
+			return;
+		}
+	}
+
+	//退出自动控制线程
+	autoDepthThread->quit();
+	autoDepthThread->wait();
+//	autoDepthThread->deleteLater();
+
+	//退出通信线程
+	commThread->quit();
+	commThread->wait();
+//	commThread->deleteLater();
 }
 
 void MainWindow::splitWindow()
@@ -141,20 +167,34 @@ void MainWindow::constructConnect()
 	qRegisterMetaType<LogPane::WarnLevel>("LogPane::WarnLevel");
 	qRegisterMetaType<PostureData>("PostureData");
 	qRegisterMetaType<LEDSetting>("LEDSetting");
+	qRegisterMetaType<Task::TaskEndStatus>("Task::TaskEndStatus");
+	qRegisterMetaType<cv::Mat>("cv::Mat");
 
 	//控制面板发出的信号--------------------------------------------------------------------------------------------------------
 	connect(pControlPane, &ControlPane::mannualGoSgl, thePropeller, &Propeller::mannualGoDelta);		//控制面板->推进器：手动前进
 	connect(pControlPane, &ControlPane::mannualTurnSgl, thePropeller, &Propeller::mannualTurnDelta);	//控制面板->推进器：手动转向
 	connect(pControlPane, &ControlPane::mannualOffsetSgl, thePropeller, &Propeller::mannualOffsetDelta);//控制面板->推进器：手动侧移
+	connect(pControlPane, &ControlPane::taskGoSgl, thePropeller, &Propeller::taskGoDelta);				//控制面板->推进器：任务前进
+	connect(pControlPane, &ControlPane::taskTurnSgl, thePropeller, &Propeller::taskTurnDelta);			//控制面板->推进器：任务转向
+	connect(pControlPane, &ControlPane::taskOffsetSgl, thePropeller, &Propeller::taskOffsetDelta);		//控制面板->推进器：任务侧移
+	connect(pControlPane, &ControlPane::taskDiveSgl, thePropeller, &Propeller::taskDiveDelta);			//控制面板->推进器：任务浮潜
+	connect(pControlPane, &ControlPane::automaticSwitch, thePropeller, &Propeller::autoCtrlRunning);	//控制面板->推进器：自动控制开关
 
 	connect(pControlPane, &ControlPane::propSwitch, theSwitchLED, &SwitchLED::propSwitchSlot);			//控制面板->开关LED：推进器开关
 	connect(pControlPane, &ControlPane::camSwitch, theSwitchLED, &SwitchLED::camSwitchSlot);			//控制面板->开关LED：摄像头开关
-	connect(pControlPane, &ControlPane::LEDFlash, theSwitchLED, &SwitchLED::setLED);					//控制面板->开关LED：设定LED颜色和闪烁频率
+	connect(pControlPane, &ControlPane::LEDFlash, theSwitchLED, &SwitchLED::setLED);					//控制面板->开关LED：LED颜色闪烁频率
 
 	connect(pControlPane, &ControlPane::autoDepthSwitch, autoControl, &AutoControl::autoDepthSwitch);	//控制面板->自动控制：定深闭环开关
 	connect(pControlPane, &ControlPane::setAutoDepth, autoControl, &AutoControl::setDepthTgt);			//控制面板->自动控制：设定定深值
 	connect(pControlPane, &ControlPane::autoHeadingSwitch, autoControl, &AutoControl::autoHeadingSwitch);//控制面板->自动控制：定航闭环开关
 	connect(pControlPane, &ControlPane::setAutoHeading, autoControl, &AutoControl::setHeadingTgt);		//控制面板->自动控制：设定定航值
+	connect(pControlPane, &ControlPane::autoPitchSwitch, autoControl, &AutoControl::autoPitchSwitch);	//控制面板->自动控制：俯仰闭环开关
+
+	connect(pControlPane, &ControlPane::propOrder, comm, &Communication::sendToPropeller);				//控制面板->通信：直接发送推进器指令
+
+	connect(pControlPane, &ControlPane::videoImg, pOpenCVPane, &OpenCVPane::ImgDispSlot);				//控制面板->opencv：显示
+
+	connect(pControlPane, &ControlPane::setAutoDepth, pChartPane, &ChartPane::setTarget);				//控制面板->图表面板：深度目标
 
 	connect(pControlPane, &ControlPane::operateLog, pLogPane, &LogPane::addString);						//控制面板->日志面板：日志
 	//--------------------------------------------------------------------------------------------------------
@@ -174,21 +214,29 @@ void MainWindow::constructConnect()
 	//--------------------------------------------------------------------------------------------------------
 
 	//通信类发出的信号--------------------------------------------------------------------------------------------------------
-	connect(comm, &Communication::LED, pControlPane, &ControlPane::setLEDColor);	//通信->控制面板：LED颜色
-	connect(comm, &Communication::depth, pControlPane, &ControlPane::setDepth);		//通信->控制面板：深度数据
-	connect(comm, &Communication::posture, pControlPane, &ControlPane::setPosture);	//通信->控制面板：姿态数据
+	connect(comm, &Communication::LED, pControlPane, &ControlPane::setLEDColor);				//通信->控制面板：LED颜色
+	connect(comm, &Communication::depth, pControlPane, &ControlPane::setDepth);					//通信->控制面板：深度数据
+	connect(comm, &Communication::depth, pControlPane, &ControlPane::depthSensor);				//通信->控制面板：深度数据
+	connect(comm, &Communication::posture, pControlPane, &ControlPane::setPosture);				//通信->控制面板：姿态数据
+	connect(comm, &Communication::posture, pControlPane, &ControlPane::postureSensor);			//通信->控制面板：姿态数据
 
-	connect(comm, &Communication::depth, autoControl, &AutoControl::depthData);		//通信->自动控制：深度数据
-	connect(comm, &Communication::posture, autoControl, &AutoControl::postureData);	//通信->自动控制：姿态数据
+	connect(comm, &Communication::leakWater, pControlPane, &ControlPane::waterLeakWarnSlot);	//通信->控制面板：漏液检测
+//	connect(comm, &Communication::recvedMsg, pControlPane, &ControlPane::setRecvMsg);			//通信->控制面板：接收到的信息
+//	connect(comm, &Communication::sendedMsg, pControlPane, &ControlPane::setSendMsg);			//通信->控制面板：发送的信息
 
-	connect(comm, &Communication::depth, this, &MainWindow::depthDispSlot);			//通信->mainwindow：深度数据显示
+	connect(comm, &Communication::depth, autoControl, &AutoControl::depthData);					//通信->自动控制：深度数据
+	connect(comm, &Communication::posture, autoControl, &AutoControl::postureData);				//通信->自动控制：姿态数据
 
-	connect(comm, &Communication::operateLog, pLogPane, &LogPane::addString);		//通信->日志面板：日志
+	connect(comm, &Communication::depth, this, &MainWindow::depthDispSlot);						//通信->mainwindow：深度数据图表显示
+	connect(comm, &Communication::leakWater, this, &MainWindow::waterLeakWarnSlot);				//通信->mainwindow：漏液检测
+
+	connect(comm, &Communication::operateLog, pLogPane, &LogPane::addString);					//通信->日志面板：日志
 	//--------------------------------------------------------------------------------------------------------
 
 	//开关及LED类发出的信号--------------------------------------------------------------------------------------------------------
 	connect(theSwitchLED, &SwitchLED::switchOrder, comm, &Communication::sendToSwitchArduino);			//开关LED->通信：开关指令
 	connect(theSwitchLED, &SwitchLED::LEDOrder, comm, &Communication::sendToLEDArduino);				//开关LED->通信：LED指令
+	//LED列表为空
 	//--------------------------------------------------------------------------------------------------------
 //	connect(this, &MainWindow::startAutoCtrl, autoControl, &autoControl::start);
 }
@@ -212,8 +260,16 @@ void MainWindow::waterLeakWarnSlot()
 	s.flashTimes = 0;
 	s.colorList<<QColor(255,0,0)<<QColor(0,0,0);
 	theSwitchLED->setLED(s);
-	pLogPane->addString(QSL("漏液检测：舱内已侦测到液体，请及时处理"), LogPane::err);
-	QMessageBox::critical(this, QSL("检测到舱内漏液"), QSL("漏液检测装置检测到舱内存在液体，及时处理"));
+	static bool isWarned = false;
+	if(!isWarned)
+	{
+		isWarned = true;
+		pLogPane->addString(QSL("漏液检测：舱内已侦测到液体，请及时处理"), LogPane::err);
+		QMessageBox::critical(this, QSL("检测到舱内漏液"), QSL("漏液检测装置检测到舱内存在液体，及时处理"));
+		QPalette ControlPal(pControlPane->palette());
+		ControlPal.setColor(QPalette::Background, QColor(255,0,0));
+		pControlPane->setPalette(ControlPal);
+	}
 }
 
 void MainWindow::on_actChartAniSwitch_triggered(bool checked)

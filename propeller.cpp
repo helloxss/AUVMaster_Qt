@@ -4,13 +4,10 @@
 Propeller::Propeller(QObject *parent) :
 	QObject(parent)
 {
-	memset(task, 0, sizeof(int)*6);
 	orderTimer = new QTimer(this);
 	if(orderTimer)
-	{
 		connect(orderTimer, &QTimer::timeout, this, &Propeller::orderTimerUpdate);
-		orderTimer->start(100);
-	}
+
 }
 
 Propeller::~Propeller()
@@ -18,62 +15,173 @@ Propeller::~Propeller()
 
 }
 
+void Propeller::mannualGoDelta(int m)
+{
+	mannualGo = m;
+
+	if(!isAutomatic)
+	{
+		leftMain = mannualGo;
+		rightMain = mannualGo;
+		backVert = 0;
+		backHori = -mannualTurn + mannualOffset;
+		frontHori = mannualTurn + mannualOffset;
+		frontVert = 0;
+
+		checkLimit();
+		emit order(propOrderStr());
+		emit relativeThrust(leftMain, rightMain, backVert, backHori, frontHori, frontVert);
+	}
+}
+
+void Propeller::mannualTurnDelta(int h)
+{
+	mannualTurn = h;
+
+	if(!isAutomatic)
+	{
+		leftMain = mannualGo;
+		rightMain = mannualGo;
+		backVert = 0;
+		backHori = -mannualTurn + mannualOffset;
+		frontHori = mannualTurn + mannualOffset;
+		frontVert = 0;
+
+		checkLimit();
+		emit order(propOrderStr());
+		emit relativeThrust(leftMain, rightMain, backVert, backHori, frontHori, frontVert);
+	}
+}
+
+void Propeller::mannualOffsetDelta(int h)
+{
+	mannualOffset = h;
+
+	if(!isAutomatic)
+	{
+		leftMain = mannualGo;
+		rightMain = mannualGo;
+		backVert = 0;
+		backHori = -mannualTurn + mannualOffset;
+		frontHori = mannualTurn + mannualOffset;
+		frontVert = 0;
+
+		checkLimit();
+		emit order(propOrderStr());
+		emit relativeThrust(leftMain, rightMain, backVert, backHori, frontHori, frontVert);
+	}
+}
+
+void Propeller::autoCtrlRunning(unsigned char b)
+{
+	isAutomatic = b;
+
+	if((b & 0x1) == 0)//定深未开启
+	{
+		autoDepthVert = 0;
+	}
+	if((b & 0x2) == 0)//定俯仰未开启
+	{
+		autoPitchVertLv = 0;
+	}
+	if((b & 0x4) == 0)
+	{
+		autoHeadingHoriLv = 0;
+	}
+	if((b & 0x8) == 0)
+	{
+		taskGo = taskDive = taskTurn = taskOffset = 0;
+	}
+
+	if(orderTimer)
+	{
+		if(b)
+		{
+			if(!orderTimer->isActive())
+				orderTimer->start(100);
+		}
+		else
+		{
+			orderTimer->stop();
+
+			leftMain = mannualGo;
+			rightMain = mannualGo;
+			backVert = 0;
+			backHori = -mannualTurn + mannualOffset;
+			frontHori = mannualTurn + mannualOffset;
+			frontVert = 0;
+
+			checkLimit();
+			emit order(propOrderStr());
+			emit relativeThrust(leftMain, rightMain, backVert, backHori, frontHori, frontVert);
+		}
+	}
+}
+
 void Propeller::orderTimerUpdate()
 {
-	leftMain = task[0] + mannualGo;
-	rightMain = task[1] + mannualGo;
-	backVert = task[2] + autoDepthVert + autoPitchVertLv;
-	backHori = task[3] + autoHeadingHoriLv + mannualTurn + mannualOffset;
-	frontHori = task[4] - autoHeadingHoriLv - mannualTurn + mannualOffset;
-	frontVert = task[5] + autoDepthVert - autoPitchVertLv;
+	leftMain = taskGo + mannualGo;
+	rightMain = taskGo + mannualGo;
+	backVert = taskDive + autoDepthVert - autoPitchVertLv;
+	backHori = - taskTurn + taskOffset - autoHeadingHoriLv - mannualTurn + mannualOffset;
+	frontHori = taskTurn + taskOffset + autoHeadingHoriLv + mannualTurn + mannualOffset;
+	frontVert = taskDive + autoDepthVert + autoPitchVertLv ;
 
 	checkLimit();
+	emit order(propOrderStr());
+	emit relativeThrust(leftMain, rightMain, backVert, backHori, frontHori, frontVert);
+}
 
+QString Propeller::propOrderStr()
+{
 	QString orderStr;
 	if(leftMain > 0)
-		orderStr += QSL("#1P%1").arg(leftMainHighDZ + leftMain);
+		orderStr += QString("#1P%1").arg(leftMainHighDZ + leftMain);
 	else if(leftMain < 0)
-		orderStr += QSL("#1P%1").arg(leftMainLowDZ + leftMain);
+		orderStr += QString("#1P%1").arg(leftMainLowDZ + leftMain);
 	else
-		orderStr += QSL("#1P1500");
+		orderStr += QString("#1P1500");
 
 	if(rightMain > 0)
-		orderStr += QSL("#2P%1").arg(rightMainHighDZ + rightMain);
+		orderStr += QString("#2P%1").arg(rightMainHighDZ + rightMain);
 	else if(rightMain < 0)
-		orderStr += QSL("#2P%1").arg(rightMainLowDZ + rightMain);
+		orderStr += QString("#2P%1").arg(rightMainLowDZ + rightMain);
 	else
-		orderStr += QSL("#2P1500");
+		orderStr += QString("#2P1500");
 
 	if(backVert > 0)
-		orderStr += QSL("#3P%1").arg(backVertHighDZ + backVert);
+		orderStr += QString("#3P%1").arg(backVertHighDZ + backVert);
 	else if(backVert < 0)
-		orderStr += QSL("#3P%1").arg(backVertLowDZ + backVert);
+		orderStr += QString("#3P%1").arg(backVertLowDZ + backVert);
 	else
-		orderStr += QSL("#3P1500");
+		orderStr += QString("#3P1500");
 
 	if(backHori > 0)
-		orderStr += QSL("#4P%1").arg(backHoriHighDZ + backHori);
+		orderStr += QString("#4P%1").arg(backHoriHighDZ + backHori);
 	else if(backHori < 0)
-		orderStr += QSL("#4P%1").arg(backHoriLowDZ + backHori);
+		orderStr += QString("#4P%1").arg(backHoriLowDZ + backHori);
 	else
-		orderStr += QSL("#4P1500");
+		orderStr += QString("#4P1500");
 
 	if(frontHori > 0)
-		orderStr += QSL("#5P%1").arg(frontHoriHighDZ + frontHori);
+		orderStr += QString("#5P%1").arg(frontHoriHighDZ + frontHori);
 	else if(frontHori < 0)
-		orderStr += QSL("#5P%1").arg(frontHoriLowDZ + frontHori);
+		orderStr += QString("#5P%1").arg(frontHoriLowDZ + frontHori);
 	else
-		orderStr += QSL("#5P1500");
+		orderStr += QString("#5P1500");
 
 	if(frontVert > 0)
-		orderStr += QSL("#6P%1").arg(frontVertHighDZ + frontVert);
+		orderStr += QString("#6P%1").arg(frontVertHighDZ + frontVert);
 	else if(frontVert < 0)
-		orderStr += QSL("#6P%1").arg(frontVertLowDZ + frontVert);
+		orderStr += QString("#6P%1").arg(frontVertLowDZ + frontVert);
 	else
-		orderStr += QSL("#6P1500");
+		orderStr += QString("#6P1500");
 
-	emit order(orderStr);
-	emit relativeThrust(leftMain, rightMain, backVert, backHori, frontHori, frontVert);
+	orderStr += "T200\r\n";
+
+//	qDebug()<<orderStr;
+
+	return orderStr;
 }
 
 void Propeller::checkLimit()

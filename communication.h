@@ -23,6 +23,8 @@ signals:
 	void LED(QColor);
 	void leakWater();
 	void operateLog(QString s, LogPane::WarnLevel level);
+	void recvedMsg(QString sender, QString msg);
+	void sendedMsg(QString sender, QString msg);
 
 public slots:
 	void create();
