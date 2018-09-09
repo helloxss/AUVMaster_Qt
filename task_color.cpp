@@ -36,7 +36,7 @@ void Task_Color::taskSetUp()
 	{
 		if (!isCamThreadRun)
 		{
-			MVSetExposureTime(Vision::fCamHdl, 5500);
+			MVSetExposureTime(Vision::fCamHdl, 200);
 			MVSTATUS_CODES r = MVStartGrab(Vision::fCamHdl, &Vision::microVisionCallBack, (long long)this);
 			if(r != MVST_SUCCESS)
 			{
@@ -355,7 +355,7 @@ void Task_Color::camIdentifyTarget(Mat src)
 	int YHmax = min(YHmin + YH_delta, 255);
 	int YSmax = min(YSmin + YS_delta, 255);
 
-	Vision::detectColor(src, img_YH, img_YS, img_Y_detected, 0, 34, YSmin, YSmax, 34);
+	Vision::detectColor(src, img_YH, img_YS, img_Y_detected, 0/*hmin*/, 34/*hmax*/,  43/*smin*/, 255/*smax*/, 34/*hdelta*/);
 
 	GaussianBlur(img_Y_detected, img_Y_detected, Size(3, 3), 0.1, 0, BORDER_DEFAULT); //高斯滤波
 	blur(img_Y_detected, img_Y_detected, Size(3, 3)); //均值滤波

@@ -10,7 +10,7 @@ public:
 	virtual ~Task_Cruise();
 	static QString taskName;
 
-	const unsigned int securityTimerConst = 10;//安保定时器定时时间 in second
+	const unsigned int securityTimerConst = 300;//安保定时器定时时间 in second
 	struct cruiseSettings
 	{
 		unsigned int runTime;//in second

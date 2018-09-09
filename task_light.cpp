@@ -33,7 +33,7 @@ void Task_Light::taskSetUp()
 	{
 		if (!isCamThreadRun)
 		{
-			MVSetExposureTime(Vision::fCamHdl, 400);
+			MVSetExposureTime(Vision::fCamHdl, 120);
 			MVSTATUS_CODES r = MVStartGrab(Vision::fCamHdl, &Vision::microVisionCallBack, (long long)this);
 			if(r != MVST_SUCCESS)
 			{
