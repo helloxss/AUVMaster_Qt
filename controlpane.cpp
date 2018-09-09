@@ -467,6 +467,7 @@ void ControlPane::onTaskComplete(Task::TaskEndStatus s)
 			setHeadingAutomation(false);
 			LEDSetting s; s.changeTime = 1000; s.flashTimes =3 ; s.colorList<<QColor(255,255,255)<<QColor(0,0,0);
 			emit LEDFlash(s);
+			QTimer::singleShot(250, [this]{emit mannualGoSgl(0);});
 
 			return;
 		}
@@ -494,6 +495,8 @@ void ControlPane::onTaskComplete(Task::TaskEndStatus s)
 					setHeadingAutomation(false);
 					LEDSetting s; s.changeTime = 1000; s.flashTimes =3 ; s.colorList<<QColor(255,255,255)<<QColor(0,0,0);
 					emit LEDFlash(s);
+
+					QTimer::singleShot(250, [this]{emit mannualGoSgl(0);});
 				}//(creatTaskThread(taskList.first())) else
 			}
 		}

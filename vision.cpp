@@ -241,8 +241,8 @@ void Vision::detectColor(const Mat &img_input, Mat &img_H, Mat &img_S, Mat &img_
 	Mat img_H1, img_H2;
 	Mat img_rangedH, img_rangedS,img_rangedV;
 	vector<Mat> channels;
-	int Vmin=160;
-	int Vmax=255;
+	int Vmin=50;
+	int Vmax=180;
 	//将色彩空间从BGR转换到HSV
 	cvtColor(img_input, img_hsv, COLOR_BGR2HSV);
 	//分离成H、S、V三个通道
